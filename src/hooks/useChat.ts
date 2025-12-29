@@ -10,6 +10,8 @@ export const useChat = (guestUserId: string) => {
   const [sessionId, setSessionId] = useState<string | null>(
     localStorage.getItem('sessionId')
   );
+  const [conversationVersion, setConversationVersion] = useState(0);
+
   
   useEffect(() => {
     if (!sessionId) {
@@ -53,6 +55,7 @@ export const useChat = (guestUserId: string) => {
       if (!sessionId) {
         setSessionId(res.sessionId);
         localStorage.setItem('sessionId', res.sessionId);
+        setConversationVersion(v => v + 1);
       }
 
       const aiMsg: Message = {
@@ -95,6 +98,7 @@ export const useChat = (guestUserId: string) => {
     setUiError,
     send,
     createNewChat,
-    loadConversation
+    loadConversation,
+    conversationVersion
   };
 };

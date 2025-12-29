@@ -11,7 +11,6 @@ import { useChat } from './hooks/useChat';
 const App = () => {
   const [input, setInput] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [refreshSidebarKey, setRefreshSidebarKey] = useState(0);
 
   const getGuestUserId = () => {
     let id = localStorage.getItem('guestUserId');
@@ -26,7 +25,7 @@ const App = () => {
 
   const {
     messages, isLoading, historyLoaded, sessionId, uiError,
-    setUiError, send, createNewChat, loadConversation
+    setUiError, send, createNewChat, loadConversation, conversationVersion
   } = useChat(guestUserId);
 
   const scrollContainerRef = useAutoScroll(messages);
@@ -36,9 +35,6 @@ const App = () => {
     if (!text.trim()) return;
     setInput('');
     send(text);
-    if (!sessionId) {
-      setRefreshSidebarKey(prev => prev + 1);
-    }
   };
 
 
@@ -52,7 +48,7 @@ const App = () => {
           onNewChat={createNewChat}
           onSelectConversation={loadConversation}
           sessionId={sessionId}
-          refreshKey={refreshSidebarKey}
+          refreshKey={conversationVersion}
         />
         <div className="flex-1 flex flex-col min-w-0 relative">
           <Header
