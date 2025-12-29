@@ -16,9 +16,9 @@ interface SidebarProps {
 
 export const Sidebar = ({ onNewChat, isOpen, setIsOpen, onSelectConversation, sessionId, refreshKey }: SidebarProps) => {
   const [history, setHistory] = useState<Conversation[]>([]);
-  const [selected,setSelected] = useState("");
+  const [selected, setSelected] = useState("");
   const [isLoadingConversations, setIsLoadingConversations] = useState(true);
-  const [uiError,setUiError] = useState<string | null>(null);
+  const [uiError, setUiError] = useState<string | null>(null);
   //   const userId = localStorage.getItem('guestUserId');
   //   if (!userId) return;
 
@@ -37,33 +37,33 @@ export const Sidebar = ({ onNewChat, isOpen, setIsOpen, onSelectConversation, se
   // }, [refreshKey]);
 
   useEffect(() => {
-  const userId = localStorage.getItem('guestUserId');
-  if (!userId) return;
+    const userId = localStorage.getItem('guestUserId');
+    if (!userId) return;
 
-  setIsLoadingConversations(true);
-  setUiError(null);
+    setIsLoadingConversations(true);
+    setUiError(null);
 
-  fetch(`${API_BASE}/chat/conversations?userId=${userId}`)
-    .then(res => {
-      if (!res.ok) throw new Error();
-      return res.json();
-    })
-    .then(data => {
-      setHistory(data.conversations);
-    })
-    .catch(() => {
-      setUiError("Failed to load conversations");
-    })
-    .finally(() => {
-      setIsLoadingConversations(false);
-    });
-}, [refreshKey]);
+    fetch(`${API_BASE}/chat/conversations?userId=${userId}`)
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(data => {
+        setHistory(data.conversations ?? []);
+      })
+      .catch(() => {
+        setUiError("Failed to load conversations");
+      })
+      .finally(() => {
+        setIsLoadingConversations(false);
+      });
+  }, [refreshKey]);
 
-  useEffect(()=>{
-    if(sessionId){
+  useEffect(() => {
+    if (sessionId) {
       setSelected(sessionId);
     }
-  },[sessionId])
+  }, [sessionId])
 
   return (
     <aside className={`
@@ -86,8 +86,14 @@ export const Sidebar = ({ onNewChat, isOpen, setIsOpen, onSelectConversation, se
       <div className="flex-1 overflow-y-auto px-2 space-y-1">
         <p className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Recent</p>
         {
-        uiError && <InlineError message={uiError} onClose={() => setUiError(null)} />
-      }
+          uiError && <InlineError message={uiError} onClose={() => setUiError(null)} />
+        }
+        {!isLoadingConversations && history.length === 0 && !uiError && (
+          <p className="px-3 py-2 text-xs text-slate-400">
+            No conversations yet
+          </p>
+        )
+        }
         {isLoadingConversations ? (
           Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3 w-full p-3 rounded-xl bg-slate-100 dark:bg-white/5 animate-pulse">
@@ -99,7 +105,7 @@ export const Sidebar = ({ onNewChat, isOpen, setIsOpen, onSelectConversation, se
           history.map((item, i) => (
             <button
               key={i}
-              onClick={() => {onSelectConversation(item.id), setSelected(item.id), setIsOpen(false)}}
+              onClick={() => { onSelectConversation(item.id), setSelected(item.id), setIsOpen(false) }}
               className={`flex items-center gap-3 w-full p-3 rounded-xl hover:bg-slate-200 dark:hover:bg-white/5 transition-colors text-sm text-left truncate group cursor-pointer ${item.id === selected ? 'bg-slate-200 dark:bg-white/5 font-medium' : ''}`}
             >
               <MessageSquare size={16} className={`${item.id === selected ? 'text-blue-500' : 'text-slate-400'} group-hover:text-blue-500`} />
