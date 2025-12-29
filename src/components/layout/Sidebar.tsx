@@ -38,7 +38,10 @@ export const Sidebar = ({ onNewChat, isOpen, setIsOpen, onSelectConversation, se
 
   useEffect(() => {
     const userId = localStorage.getItem('guestUserId');
-    if (!userId) return;
+    if (!userId) {
+      setIsLoadingConversations(false);
+      return;
+    }
 
     setIsLoadingConversations(true);
     setUiError(null);
